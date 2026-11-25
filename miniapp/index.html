@@ -1,0 +1,689 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Football Intelligence</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: #071225;
+      --panel: #11213b;
+      --gold: #f4c95d;
+      --muted: #9cabc2;
+      --green: #38d996;
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
+    body {
+      margin: 0;
+      min-width: 280px;
+      min-height: 100vh;
+      background: var(--bg);
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .app {
+      max-width: 600px;
+      margin: auto;
+      padding: 22px 16px calc(96px + env(safe-area-inset-bottom));
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo { font-size: clamp(15px, 4vw, 20px); font-weight: 800; }
+    .gold { color: var(--gold); }
+    .muted { color: var(--muted); font-size: 13px; }
+    .hero {
+      margin: 24px 0;
+      padding: 26px 20px;
+      border-radius: 22px;
+      background: linear-gradient(125deg,#203b64,#0d182d);
+      border: 1px solid #40516c;
+    }
+    .hero h1 { font-size: clamp(24px, 7vw, 28px); margin: 8px 0; }
+    .pill {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 30px;
+      background: #263c51;
+      color: var(--green);
+      font-size: 12px;
+    }
+    h2 { font-size: 19px; margin-top: 26px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 12px;
+    }
+    button {
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+      touch-action: manipulation;
+    }
+    button:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 3px;
+    }
+    .tile {
+      text-align: left;
+      background: var(--panel);
+      border: 1px solid #263a57;
+      border-radius: 18px;
+      padding: 19px 14px;
+      min-height: 125px;
+    }
+    .tile .emoji { font-size: 29px; display: block; }
+    .tile strong { display: block; margin: 12px 0 6px; }
+    .tile small { color: var(--muted); }
+    .match {
+      background: var(--panel);
+      padding: 20px;
+      border-radius: 18px;
+      margin-top: 12px;
+      text-align: center;
+    }
+    .notice {
+      padding: 14px;
+      background: #192d43;
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 14px;
+    }
+    .nav {
+      position: fixed;
+      z-index: 10;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #0d1b31;
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 5px calc(8px + env(safe-area-inset-bottom));
+      border-top: 1px solid #30415c;
+    }
+    .nav button {
+      flex: 1;
+      min-width: 0;
+      min-height: 48px;
+      border: 0;
+      background: transparent;
+      font-size: clamp(10px, 2.8vw, 12px);
+      line-height: 1.35;
+    }
+    .nav button[aria-current="page"] { color: var(--gold); }
+    .page { display: none; }
+    .page.active { display: block; }
+    .back {
+      background: var(--gold);
+      color: #071225;
+      border: 0;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: bold;
+      margin-top: 16px;
+    }
+    .wallet-refresh {
+      min-height: 44px;
+      margin-top: 14px;
+      padding: 10px 16px;
+      border: 1px solid #405575;
+      border-radius: 12px;
+      background: #203452;
+    }
+    @media (max-width: 360px) {
+      .app { padding-right: 12px; padding-left: 12px; }
+      .hero { padding: 22px 16px; }
+      .tile { min-height: 112px; padding: 14px 11px; }
+    }
+  </style>
+<style>
+body {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(4, 12, 28, .88),
+        rgba(5, 18, 34, .93)
+      ),
+      url("stadium.jpg") center center / cover fixed;
+    color: #f5f5f5;
+}
+
+.tile {
+    background: rgba(9, 22, 40, .88);
+    border: 1px solid rgba(226, 183, 72, .65);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+    backdrop-filter: blur(8px);
+}
+
+.tile:hover {
+    border-color: #f4c95d;
+}
+
+.nav {
+    background: rgba(6, 17, 34, .96);
+    backdrop-filter: blur(12px);
+}
+</style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="logo">⚽ FOOTBALL <span class="gold">INTELLIGENCE</span></div>
+      <span class="gold">★</span>
+    </header>
+
+    <section id="home" class="page active">
+      <div class="hero">
+        <span class="pill">FOOTBALL INTELLIGENCE</span>
+        <h1>Know the Game.<br><span class="gold">Beyond the Score.</span></h1>
+        <p class="muted">Live football, intelligent analysis, quizzes and rewards.</p>
+      </div>
+
+      <h2>Explore Football</h2>
+      <div class="grid">
+        <button class="tile" onclick="showPage('matches')">
+          <strong>Live Matches</strong>
+          <small>Scores and fixtures</small>
+        </button>
+        <button class="tile" onclick="showPage('quiz')">
+          <strong>Quiz Arena</strong>
+          <small>Test your knowledge</small>
+        </button>
+        <button class="tile" onclick="showPage('analysis')">
+          <strong>Intelligence</strong>
+          <small>Match statistics</small>
+        </button>
+        <button class="tile" onclick="showPage('premium')">
+          <strong>Premium</strong>
+          <small>Advanced reports</small>
+        </button>
+        <button class="tile" onclick="showPage('rewards')">
+          <strong>Rewards</strong>
+          <small>FI Stars wallet and leaderboard</small>
+        </button>
+        <button class="tile" onclick="showPage('news')">
+          <strong>Transfers</strong>
+          <small>Football news</small>
+        </button>
+      </div>
+    </section>
+
+    <section id="matches" class="page">
+      <h2>⚽ Live Match Center</h2>
+      <div class="notice" id="matchStatus">Loading football matches...</div>
+<div id="liveMatchList"></div>
+<button type="button" onclick="loadLiveMatches()">Refresh Matches</button>
+    </section>
+
+    <section id="quiz" class="page">
+      <h2>🧠 Football Quiz Arena</h2>
+      <p class="muted">All quizzes are free. Each question can earn FI Stars once per UTC day, and daily earnings are capped.</p>
+      <div class="grid">
+        <button class="tile" onclick="quizNotice('Players')">⭐<strong>Players</strong></button>
+        <button class="tile" onclick="quizNotice('Coaches')">🧠<strong>Coaches</strong></button>
+        <button class="tile" onclick="quizNotice('Clubs')">🛡️<strong>Clubs & Teams</strong></button>
+        <button class="tile" onclick="quizNotice('Transfers')">🔄<strong>Transfers</strong></button>
+        <button class="tile" onclick="quizNotice('History')">🏆<strong>History</strong></button>
+        <button class="tile" onclick="quizNotice('International')">🌍<strong>International</strong></button>
+      </div>
+      <div id="quizMessage" class="notice">
+        Practice questions are available here. FI Stars are awarded and tracked securely by the bot; this mini app's practice score is not a wallet balance.
+      </div>
+    </section>
+
+    <section id="analysis" class="page">
+      <h2>📊 Match Intelligence</h2>
+      <div class="match">Team form • Goals • Corners • Player statistics</div>
+      <div class="notice">Verified match data will be connected here.</div>
+    </section>
+
+    <section id="premium" class="page">
+      <h2>👑 Premium Intelligence</h2>
+      <div class="match">🔒 Advanced match reports</div>
+      <div class="notice">Premium access is not available for purchase. Telegram Stars test-payment preparation is inactive: no invoice or charge is sent.</div>
+    </section>
+
+    <section id="rewards" class="page">
+      <h2>⭐ FI Stars Wallet</h2>
+      <div id="walletStatus" class="notice" role="status" aria-live="polite">
+        Open this Mini App from Telegram to authenticate and load your wallet.
+      </div>
+      <div class="match">
+        <strong>Balance</strong>
+        <div id="walletBalance" class="gold">— FI Stars</div>
+        <p id="walletWeekly" class="muted">This week: — FI Stars</p>
+        <button class="wallet-refresh" type="button" onclick="loadFiWallet()">Refresh wallet</button>
+      </div>
+      <h2>Achievements</h2>
+      <div id="walletBadges" class="notice">No badges loaded.</div>
+      <h2>Weekly leaderboard</h2>
+      <div id="walletLeaderboard" class="notice" role="status" aria-live="polite">
+        Open this Mini App from Telegram to load the leaderboard.
+      </div>
+      <h2>Recent transactions</h2>
+      <div id="walletHistory" class="notice">No history loaded.</div>
+      <div class="notice">FI Stars are free quiz points and are entirely separate from official Telegram Stars. They are not transferable or guaranteed cash entitlements.</div>
+      <h2>Cash redemption proposal</h2>
+      <div class="match">Provisional only: 5,000 FI Stars = €5; minimum €5; maximum €5 per eligible member per month; pilot budget €20 per month.</div>
+      <div class="notice"><strong>Redemption is disabled.</strong> These values are not a promise or entitlement. No payout can be requested or issued. Activation requires legal approval, payment-provider approval and confirmed reward funding.</div>
+    </section>
+
+    <section id="news" class="page">
+      <h2>🔄 Transfer Center</h2>
+      <div class="match">Confirmed transfers, rumours and football news.</div>
+      <div class="notice">News sources are not connected yet.</div>
+    </section>
+  </main>
+
+  <nav class="nav" aria-label="Main navigation">
+    <button type="button" aria-current="page" onclick="showPage('home')">🏠<br>Home</button>
+    <button type="button" onclick="showPage('matches')">⚽<br>Matches</button>
+    <button type="button" onclick="showPage('quiz')">🧠<br>Quiz</button>
+    <button type="button" onclick="showPage('premium')">👑<br>Premium</button>
+    <button type="button" onclick="showPage('rewards')">🏆<br>Rewards</button>
+  </nav>
+
+  <script>
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    }
+
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.nav button').forEach(button => {
+        if (button.getAttribute('onclick') === "showPage('" + id + "')") {
+          button.setAttribute('aria-current', 'page');
+        } else {
+          button.removeAttribute('aria-current');
+        }
+      });
+      if (id === 'rewards') loadFiWallet();
+      window.scrollTo(0, 0);
+    }
+
+    function quizNotice(category) {
+      document.getElementById('quizMessage').textContent =
+        category + ' quiz questions are coming soon.';
+    }
+  </script>
+<style>
+  .quiz-box {
+    margin-top: 18px;
+    padding: 20px;
+    background: #11213b;
+    border: 1px solid #30415c;
+    border-radius: 18px;
+  }
+  .quiz-option {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    background: #203452;
+    border: 1px solid #405575;
+    border-radius: 12px;
+    text-align: left;
+  }
+  .quiz-option:disabled { cursor: default; opacity: .85; }
+  .quiz-option.correct { background: #176447; }
+  .quiz-option.wrong { background: #74323c; }
+  .quiz-next {
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 12px;
+    background: #f4c95d;
+    color: #071225;
+    font-weight: bold;
+  }
+</style>
+
+<script>
+const footballQuestions = {
+  Players: [
+    {
+      q: "Which player won the 2022 FIFA World Cup Golden Ball?",
+      a: ["Kylian Mbappe", "Lionel Messi", "Luka Modric", "Antoine Griezmann"],
+      correct: 1
+    },
+    {
+      q: "Which club did Cristiano Ronaldo join from Sporting CP in 2003?",
+      a: ["Real Madrid", "Juventus", "Manchester United", "Chelsea"],
+      correct: 2
+    }
+  ],
+  Coaches: [
+    {
+      q: "Who managed Manchester City when they won the 2023 Champions League?",
+      a: ["Jose Mourinho", "Pep Guardiola", "Jurgen Klopp", "Carlo Ancelotti"],
+      correct: 1
+    },
+    {
+      q: "Which manager led Leicester City to the 2015-16 Premier League title?",
+      a: ["Claudio Ranieri", "Brendan Rodgers", "Antonio Conte", "Arsene Wenger"],
+      correct: 0
+    }
+  ],
+  Clubs: [
+    {
+      q: "Which club won the first UEFA Champions League under its new name in 1993?",
+      a: ["AC Milan", "Barcelona", "Marseille", "Ajax"],
+      correct: 2
+    },
+    {
+      q: "Which German club is nicknamed Die Roten?",
+      a: ["Bayern Munich", "Borussia Dortmund", "Schalke 04", "Werder Bremen"],
+      correct: 0
+    }
+  ],
+  Transfers: [
+    {
+      q: "Which club signed Neymar from Barcelona in 2017?",
+      a: ["Chelsea", "PSG", "Manchester City", "Bayern Munich"],
+      correct: 1
+    },
+    {
+      q: "Which club did Jude Bellingham join in 2023?",
+      a: ["Liverpool", "Barcelona", "Real Madrid", "Arsenal"],
+      correct: 2
+    }
+  ],
+  History: [
+    {
+      q: "Which country hosted the 2010 FIFA World Cup?",
+      a: ["Brazil", "Germany", "South Africa", "Japan"],
+      correct: 2
+    },
+    {
+      q: "Which nation won the first FIFA World Cup in 1930?",
+      a: ["Argentina", "Uruguay", "Italy", "Brazil"],
+      correct: 1
+    }
+  ],
+  International: [
+    {
+      q: "Which country won UEFA Euro 2016?",
+      a: ["France", "Germany", "Spain", "Portugal"],
+      correct: 3
+    },
+    {
+      q: "Which African country reached the semifinals of the 2022 FIFA World Cup?",
+      a: ["Ghana", "Senegal", "Morocco", "Cameroon"],
+      correct: 2
+    }
+  ]
+};
+
+let quizState = null;
+
+function quizNotice(category) {
+  const area = document.getElementById("quizMessage");
+  if (!footballQuestions[category]) return;
+
+  quizState = {
+    category: category,
+    index: 0,
+    score: 0,
+    answered: false
+  };
+
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const area = document.getElementById("quizMessage");
+  const questions = footballQuestions[quizState.category];
+
+  if (quizState.index >= questions.length) {
+    area.innerHTML = `
+      <div class="quiz-box">
+        <h2>🏆 Challenge Complete!</h2>
+        <p>${quizState.category}</p>
+        <h1 class="gold">${quizState.score} XP</h1>
+        <p class="muted">Practice score — not yet saved to your Telegram account.</p>
+        <button class="quiz-next" onclick="quizNotice('${quizState.category}')">
+          Play Again
+        </button>
+      </div>`;
+    return;
+  }
+
+  const question = questions[quizState.index];
+  quizState.answered = false;
+
+  area.innerHTML = `
+    <div class="quiz-box">
+      <span class="pill">${quizState.category} • Question ${quizState.index + 1}/${questions.length}</span>
+      <h2>${question.q}</h2>
+      <div id="quizAnswers"></div>
+      <p id="quizFeedback"></p>
+      <button id="nextQuiz" class="quiz-next" style="display:none"
+        onclick="nextFootballQuestion()">Next Question ➜</button>
+    </div>`;
+
+  const answers = document.getElementById("quizAnswers");
+  question.a.forEach((answer, i) => {
+    const button = document.createElement("button");
+    button.className = "quiz-option";
+    button.textContent = answer;
+    button.onclick = () => answerFootballQuestion(i);
+    answers.appendChild(button);
+  });
+}
+
+function answerFootballQuestion(selected) {
+  if (!quizState || quizState.answered) return;
+
+  quizState.answered = true;
+  const question = footballQuestions[quizState.category][quizState.index];
+  const correct = selected === question.correct;
+
+  if (correct) quizState.score += 10;
+
+  document.querySelectorAll(".quiz-option").forEach((button, i) => {
+    button.disabled = true;
+    if (i === question.correct) button.classList.add("correct");
+    else if (i === selected) button.classList.add("wrong");
+  });
+
+  document.getElementById("quizFeedback").textContent =
+    correct ? "✅ Correct! +10 XP" : "❌ Not quite. The correct answer is highlighted.";
+
+  document.getElementById("nextQuiz").style.display = "inline-block";
+}
+
+function nextFootballQuestion() {
+  quizState.index++;
+  renderQuestion();
+}
+
+async function loadFiWallet() {
+  const status = document.getElementById("walletStatus");
+  const balance = document.getElementById("walletBalance");
+  const weekly = document.getElementById("walletWeekly");
+  const badges = document.getElementById("walletBadges");
+  const leaderboard = document.getElementById("walletLeaderboard");
+  const history = document.getElementById("walletHistory");
+  const telegram = window.Telegram && window.Telegram.WebApp;
+
+  balance.textContent = "— FI Stars";
+  weekly.textContent = "This week: — FI Stars";
+  badges.textContent = "Loading achievements…";
+  history.textContent = "Loading transactions…";
+  leaderboard.textContent = "Loading weekly leaderboard…";
+  if (!telegram || !telegram.initData) {
+    status.textContent =
+      "Open this Mini App from Telegram to authenticate and load your wallet.";
+    badges.textContent = "Telegram authentication is required.";
+    history.textContent = "Telegram authentication is required.";
+    leaderboard.textContent = "Open this Mini App from Telegram to load the leaderboard.";
+    return;
+  }
+
+  status.textContent = "Loading your secure FI Stars wallet…";
+  const authenticatedGet = async path => {
+    const response = await fetch(path, {
+      method: "GET",
+      mode: "same-origin",
+      credentials: "omit",
+      cache: "no-store",
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "tma " + telegram.initData
+      }
+    });
+    if (!response.ok) {
+      throw new Error(response.status === 401
+        ? "Telegram authentication expired. Close and reopen the Mini App."
+        : "Service is unavailable. Please try again later.");
+    }
+    return response.json();
+  };
+
+  try {
+    const data = await authenticatedGet("/api/wallet");
+    if (!Number.isSafeInteger(data.fi_stars) ||
+        !Number.isSafeInteger(data.weekly_fi_stars) ||
+        !Array.isArray(data.badges) ||
+        !Array.isArray(data.history)) {
+      throw new Error("Wallet service returned an invalid response.");
+    }
+
+    balance.textContent = data.fi_stars.toLocaleString() + " FI Stars";
+    weekly.textContent =
+      "This week: " + data.weekly_fi_stars.toLocaleString() + " FI Stars";
+    badges.replaceChildren();
+    if (data.badges.length === 0) {
+      badges.textContent = "No badges earned yet.";
+    } else {
+      data.badges.forEach(name => {
+        const item = document.createElement("span");
+        item.className = "pill";
+        item.textContent = String(name);
+        badges.appendChild(item);
+        badges.appendChild(document.createTextNode(" "));
+      });
+    }
+
+    history.replaceChildren();
+    if (data.history.length === 0) {
+      history.textContent = "No transactions yet.";
+    } else {
+      const list = document.createElement("ul");
+      data.history.forEach(transaction => {
+        if (!Number.isSafeInteger(transaction.amount) ||
+            !Number.isSafeInteger(transaction.created_at)) {
+          throw new Error("Wallet service returned invalid transaction data.");
+        }
+        const item = document.createElement("li");
+        const label = String(transaction.kind || "transaction")
+          .replaceAll("_", " ");
+        const date = new Date(transaction.created_at * 1000)
+          .toLocaleString();
+        item.textContent =
+          `${transaction.amount > 0 ? "+" : ""}${transaction.amount} FI Stars — ${label} (${date})`;
+        list.appendChild(item);
+      });
+      history.appendChild(list);
+    }
+    status.textContent = "Wallet updated from your Telegram account.";
+  } catch (error) {
+    status.textContent = error instanceof TypeError
+      ? "Wallet service could not be reached. Please try again later."
+      : error.message;
+    balance.textContent = "— FI Stars";
+    weekly.textContent = "This week: — FI Stars";
+    badges.textContent = "Wallet achievements could not be loaded.";
+    history.textContent = "Wallet transactions could not be loaded.";
+  }
+
+  try {
+    const data = await authenticatedGet("/api/leaderboard");
+    if (!Array.isArray(data.leaderboard) ||
+        data.leaderboard.some(entry =>
+          typeof entry.name !== "string" ||
+          !Number.isSafeInteger(entry.fi_stars))) {
+      throw new Error("Leaderboard service returned an invalid response.");
+    }
+
+    leaderboard.replaceChildren();
+    if (data.leaderboard.length === 0) {
+      leaderboard.textContent = "No FI Stars scores on the leaderboard this week.";
+    } else {
+      const list = document.createElement("ol");
+      data.leaderboard.forEach(entry => {
+        const item = document.createElement("li");
+        item.textContent =
+          `${entry.name} — ${entry.fi_stars.toLocaleString()} FI Stars`;
+        list.appendChild(item);
+      });
+      leaderboard.appendChild(list);
+    }
+  } catch (error) {
+    leaderboard.textContent = error instanceof TypeError
+      ? "Leaderboard service could not be reached. Please try again later."
+      : error.message;
+  }
+}
+</script>
+
+<script>
+async function loadLiveMatches() {
+    const list = document.getElementById("liveMatchList");
+    const status = document.getElementById("matchStatus");
+
+    if (!list || !status) return;
+
+    status.textContent = "Loading football matches...";
+    list.replaceChildren();
+
+    try {
+        const response = await fetch("http://127.0.0.1:8080/api/fixtures");
+        if (!response.ok) throw new Error("HTTP " + response.status);
+
+        const data = await response.json();
+        const matches = Array.isArray(data.fixtures) ? data.fixtures : [];
+
+        status.textContent = matches.length
+            ? matches.length + " matches available"
+            : "No matches available right now.";
+
+        for (const match of matches) {
+            const card = document.createElement("div");
+            card.className = "match";
+
+            const teams = document.createElement("strong");
+            teams.textContent = `${match.home} vs ${match.away}`;
+
+            const details = document.createElement("p");
+            const score =
+                match.home_goals == null || match.away_goals == null
+                ? "Not started"
+                : `${match.home_goals} - ${match.away_goals}`;
+
+            details.textContent =
+                `${score} | ${match.status} | ${match.league || ""}`;
+
+            card.append(teams, details);
+            list.appendChild(card);
+        }
+    } catch (error) {
+        status.textContent = "Unable to load matches: " + error.message;
+    }
+}
+
+document.addEventListener("DOMContentLoaded", loadLiveMatches);
+</script>
+</body>
+</html>

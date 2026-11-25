@@ -1,0 +1,51 @@
+# Python environments and generated files
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Local environment and credentials
+.env*
+secrets/
+.secrets/
+credentials*.json
+service-account*.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# SQLite databases and journal/sidecar files
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+
+# Common local artifacts
+*.log
+.DS_Store
+Thumbs.db
+
+# Local backups
+*.bak
+*.backup
+*.encoding-backup
+*.sqlite3
+
+
+# Additional local backups
+*.language-backup
+bot_before_football_api.py
