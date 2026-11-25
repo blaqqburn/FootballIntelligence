@@ -1,4 +1,4 @@
-
+﻿
 import asyncio
 import os
 import sqlite3
@@ -83,17 +83,17 @@ def menu():
     web_app_button = None
     if miniapp_url:
         web_app_button = InlineKeyboardButton(
-            "🌐 Open FI Mini App", web_app=WebAppInfo(url=miniapp_url)
+            "ðŸŒ Open FI Mini App", web_app=WebAppInfo(url=miniapp_url)
         )
 
     buttons = [
-        [InlineKeyboardButton("⚽ Fixtures & Live", callback_data="matches")],
-        [InlineKeyboardButton("📊 Match Analysis", callback_data="analysis")],
-        [InlineKeyboardButton("🧠 Football Quiz", callback_data="quiz")],
-        [InlineKeyboardButton("🏆 Leaderboard", callback_data="leaderboard")],
-        [InlineKeyboardButton("⭐ FI Stars Wallet", callback_data="rewards")],
-        [InlineKeyboardButton("🔒 Premium Intelligence", callback_data="premium")],
-        [InlineKeyboardButton("🎯 Potential Winnings", callback_data="winnings")]
+        [InlineKeyboardButton("âš½ Fixtures & Live", callback_data="matches")],
+        [InlineKeyboardButton("ðŸ“Š Match Analysis", callback_data="analysis")],
+        [InlineKeyboardButton("ðŸ§  Football Quiz", callback_data="quiz")],
+        [InlineKeyboardButton("ðŸ† Leaderboard", callback_data="leaderboard")],
+        [InlineKeyboardButton("â­ FI Stars Wallet", callback_data="rewards")],
+        [InlineKeyboardButton("ðŸ”’ Premium Intelligence", callback_data="premium")],
+        [InlineKeyboardButton("ðŸŽ¯ Potential Winnings", callback_data="winnings")]
     ]
     if web_app_button:
         buttons.insert(0, [web_app_button])
@@ -101,27 +101,27 @@ def menu():
 
 def back():
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("🏠 Main Menu", callback_data="home")]
+        [InlineKeyboardButton("ðŸ  Main Menu", callback_data="home")]
     ])
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     register(update.effective_user)
     await update.message.reply_text(
-        "⚽🏆 WELCOME TO FOOTBALL INTELLIGENCE!\n\n"
+        "âš½ðŸ† WELCOME TO FOOTBALL INTELLIGENCE!\n\n"
         "KNOW THE GAME. READ THE DATA.\n\n"
         "Your football hub for live scores, upcoming fixtures, "
         "match intelligence, quizzes and FI Stars.\n\n"
-        "🧠 OUR FOOTBALL INTELLIGENCE ENGINE\n"
+        "ðŸ§  OUR FOOTBALL INTELLIGENCE ENGINE\n"
         "We connect to professional football-data services to "
         "bring real match information into your Telegram experience.\n\n"
-        "📊 Explore statistics and match trends.\n"
-        "⚽ Follow live and upcoming fixtures.\n"
-        "🏆 Play quizzes and earn FI Stars.\n"
-        "🔐 Premium Intelligence is coming soon.\n\n"
-        "💡 BET SMARTER, NOT BIGGER.\n"
+        "ðŸ“Š Explore statistics and match trends.\n"
+        "âš½ Follow live and upcoming fixtures.\n"
+        "ðŸ† Play quizzes and earn FI Stars.\n"
+        "ðŸ” Premium Intelligence is coming soon.\n\n"
+        "ðŸ’¡ BET SMARTER, NOT BIGGER.\n"
         "Check the data, compare the odds and set a budget.\n"
         "Predictions are never guaranteed. Never chase losses.\n\n"
-        "👇 Choose a feature to begin:",
+        "ðŸ‘‡ Choose a feature to begin:",
         reply_markup=menu()
     )
 
@@ -129,7 +129,7 @@ async def send_quiz(query, context):
     challenge = issue_question(query.from_user.id, DB)
     if challenge is None:
         await query.edit_message_text(
-            "🏁 You've answered every available question. "
+            "ðŸ You've answered every available question. "
             "New questions will be added later.\n\n"
             "Each question can earn FI Stars only once per UTC day.",
             reply_markup=back()
@@ -147,7 +147,7 @@ async def send_quiz(query, context):
         for i, answer in enumerate(question["answers"])
     ]
     await query.edit_message_text(
-        f"🧠 FREE QUIZ • {question['category']}\n\n{question['text']}\n\n"
+        f"ðŸ§  FREE QUIZ â€¢ {question['category']}\n\n{question['text']}\n\n"
         f"Correct answers earn 10 FI Stars, up to "
         f"{DAILY_EARNING_LIMIT} per UTC day.",
         reply_markup=InlineKeyboardMarkup(buttons)
@@ -162,7 +162,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if action == "home":
         await query.edit_message_text(
-            "⚽ FOOTBALL INTELLIGENCE\n\nChoose a feature:",
+            "âš½ FOOTBALL INTELLIGENCE\n\nChoose a feature:",
             reply_markup=menu()
         )
 
@@ -185,15 +185,15 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         result = submit_answer(user.id, parts[1], choice, DB)
         if result["status"] == "correct":
-            message = f"✅ Correct! +{result['awarded']} FI Stars."
+            message = f"âœ… Correct! +{result['awarded']} FI Stars."
             if result["new_badges"]:
-                message += "\n🎖 New badge: " + ", ".join(
+                message += "\nðŸŽ– New badge: " + ", ".join(
                     result["new_badges"]
                 )
         elif result["status"] == "incorrect":
-            message = "❌ Incorrect. This question cannot be replayed today."
+            message = "âŒ Incorrect. This question cannot be replayed today."
         elif result["status"] == "daily_limit":
-            message = "✅ Correct, but your daily FI Stars limit is reached."
+            message = "âœ… Correct, but your daily FI Stars limit is reached."
         elif result["status"] == "replay":
             message = "This question has already been answered."
         elif result["status"] == "expired":
@@ -205,7 +205,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message,
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(
-                    "➡️ Next Question", callback_data="quiz"
+                    "âž¡ï¸ Next Question", callback_data="quiz"
                 )]
             ])
         )
@@ -213,7 +213,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif action == "rewards":
         data = wallet(user.id, DB)
         history = [
-            f"• {amount:+} FI Stars — {kind.replace('_', ' ')} "
+            f"â€¢ {amount:+} FI Stars â€” {kind.replace('_', ' ')} "
             f"({datetime.fromtimestamp(created_at, timezone.utc):%Y-%m-%d})"
             for amount, kind, created_at in data["history"]
         ]
@@ -221,12 +221,12 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         history_text = "\n".join(history) if history else "No transactions yet."
 
         await query.edit_message_text(
-            f"⭐ FI STARS WALLET\n\n"
+            f"â­ FI STARS WALLET\n\n"
             f"Balance: {data['fi_stars']} FI Stars\n"
             f"This week: {data['weekly_fi_stars']} FI Stars\n"
             f"Official Telegram Stars: separate and unaffected\n\n"
-            f"🎖 Achievements: {badges}\n\n"
-            f"🧾 Recent history:\n{history_text}\n\n"
+            f"ðŸŽ– Achievements: {badges}\n\n"
+            f"ðŸ§¾ Recent history:\n{history_text}\n\n"
             "FI Stars are free, non-transferable quiz points; they are "
             "not official Telegram Stars or guaranteed cash.\n\n"
             "Proposed cash values are provisional and redemption is disabled.",
@@ -236,9 +236,9 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif action == "leaderboard":
         rows = weekly_leaderboard(DB)
 
-        lines = ["🏆 WEEKLY LEADERBOARD\n"]
+        lines = ["ðŸ† WEEKLY LEADERBOARD\n"]
         for i, (name, points) in enumerate(rows, 1):
-            lines.append(f"{i}. {name} — {points} FI Stars")
+            lines.append(f"{i}. {name} â€” {points} FI Stars")
 
         if not rows:
             lines.append("No quiz scores yet!")
@@ -249,13 +249,13 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif action == "premium":
         await query.edit_message_text(
-            "🔒 PREMIUM INTELLIGENCE\n\n"
-            "🔐 Match outcome probabilities\n"
-            "🔐 Potential corners\n"
-            "🔐 Free-kick estimates\n"
-            "🔐 Player goalscorer analysis\n"
-            "🔐 Advanced match statistics\n"
-            "🔐 Prediction performance history\n\n"
+            "ðŸ”’ PREMIUM INTELLIGENCE\n\n"
+            "ðŸ” Match outcome probabilities\n"
+            "ðŸ” Potential corners\n"
+            "ðŸ” Free-kick estimates\n"
+            "ðŸ” Player goalscorer analysis\n"
+            "ðŸ” Advanced match statistics\n"
+            "ðŸ” Prediction performance history\n\n"
             "Premium reports are not available for purchase yet.\n"
             f"Test-payment design: {PAYMENT_DESIGN['telegram_stars_test']['product']} "
             f"using {PAYMENT_DESIGN['telegram_stars_test']['currency']} in "
@@ -286,7 +286,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif action == "winnings":
         context.user_data["awaiting_odds"] = True
         await query.edit_message_text(
-            "🎯 POTENTIAL WINNINGS CALCULATOR\n\n"
+            "ðŸŽ¯ POTENTIAL WINNINGS CALCULATOR\n\n"
             "Enter your stake and decimal odds separated by a space.\n\n"
             "Example: 5 2.50\n\n"
             "This calculates hypothetical returns, not a prediction.",
@@ -314,11 +314,11 @@ async def messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["awaiting_odds"] = False
 
         await update.message.reply_text(
-            f"🎯 POTENTIAL WINNINGS\n\n"
-            f"Stake: €{stake:.2f}\n"
+            f"ðŸŽ¯ POTENTIAL WINNINGS\n\n"
+            f"Stake: â‚¬{stake:.2f}\n"
             f"Decimal odds: {odds:.2f}\n"
-            f"Potential payout: €{payout:.2f}\n"
-            f"Potential net profit: €{profit:.2f}\n"
+            f"Potential payout: â‚¬{payout:.2f}\n"
+            f"Potential net profit: â‚¬{profit:.2f}\n"
             f"Break-even probability: {probability:.1f}%\n\n"
             "If the selection loses, the entire stake may be lost. "
             "Calculations exclude fees and special settlement rules.",
@@ -358,24 +358,24 @@ async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = admin_dashboard(DB)
     redemption = PROVISIONAL_REDEMPTION
     payouts = "\n".join(
-        f"#{request_id} • user {user_id} • €{amount_cents / 100:.2f} "
-        f"• {status}"
+        f"#{request_id} â€¢ user {user_id} â€¢ â‚¬{amount_cents / 100:.2f} "
+        f"â€¢ {status}"
         for request_id, user_id, amount_cents, status, _ in data["recent_payouts"]
     ) or "None"
     payments = "\n".join(
-        f"#{payment_id} • user {user_id} • {provider}/{product} "
-        f"• {amount} {currency} • {status}"
+        f"#{payment_id} â€¢ user {user_id} â€¢ {provider}/{product} "
+        f"â€¢ {amount} {currency} â€¢ {status}"
         for (
             payment_id, user_id, provider, product, amount, currency,
             status, _
         ) in data["recent_payments"]
     ) or "None"
     suspicious = "\n".join(
-        f"user {user_id or 'unknown'} • {reason}"
+        f"user {user_id or 'unknown'} â€¢ {reason}"
         for user_id, reason, _ in data["recent_suspicious_activity"]
     ) or "None"
     await update.message.reply_text(
-        "🔒 PRIVATE ADMIN DASHBOARD\n\n"
+        "ðŸ”’ PRIVATE ADMIN DASHBOARD\n\n"
         f"Users: {data['users']}\n"
         f"FI Stars awarded this month: "
         f"{data['fi_stars_awarded_this_month']}\n"
@@ -387,11 +387,11 @@ async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Recent payment records:\n{payments}\n\n"
         f"Recent suspicious activity:\n{suspicious}\n\n"
         "Provisional redemption proposal (not an entitlement): "
-        f"{redemption['stars_per_euro'] * 5:,} FI Stars = €5; "
-        f"minimum €{redemption['minimum_euro']}; "
-        f"maximum €{redemption['maximum_euro_per_member_month']} "
+        f"{redemption['stars_per_euro'] * 5:,} FI Stars = â‚¬5; "
+        f"minimum â‚¬{redemption['minimum_euro']}; "
+        f"maximum â‚¬{redemption['maximum_euro_per_member_month']} "
         "per eligible member/month; "
-        f"pilot budget €{redemption['pilot_budget_euro_per_month']}/month; "
+        f"pilot budget â‚¬{redemption['pilot_budget_euro_per_month']}/month; "
         "confirmed funding: none.\n"
         f"Redemption: {'ENABLED' if REDEMPTION_ENABLED else 'DISABLED'}\n"
         f"Cash withdrawals: "
@@ -428,10 +428,10 @@ def main():
     )
 
     api_host = os.environ.get("WALLET_API_HOST", "127.0.0.1")
-    api_port = int(os.environ.get("WALLET_API_PORT", "8080"))
+    api_port = int(os.environ.get("PORT", os.environ.get("WALLET_API_PORT", "8080")))
     _, miniapp_origin = miniapp_configuration()
     wallet_server, wallet_thread = start_wallet_api(
-        token, DB, host=api_host, port=api_port, origin=miniapp_origin
+        token, DB, host="0.0.0.0", port=api_port, origin=miniapp_origin
     )
     print("Football Intelligence v0.2 is running...")
     try:
@@ -443,4 +443,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
